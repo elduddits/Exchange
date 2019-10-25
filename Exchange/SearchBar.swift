@@ -14,7 +14,10 @@ struct SearchBar: View {
     
     var body: some View {
         HStack {
-            TextField("Enter item name", text: searchQuery)
+            TextField("Enter item name", text: searchQuery, onCommit: {
+                self.action()
+            })
+                .autocapitalization(.none)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
             
             Spacer()
@@ -24,8 +27,9 @@ struct SearchBar: View {
             }) {
                 Image(systemName: "magnifyingglass.circle")
                     .font(.title)
-            }
+            }.foregroundColor(.blue)
         }
+        .buttonStyle(PlainButtonStyle())
     }
 }
 

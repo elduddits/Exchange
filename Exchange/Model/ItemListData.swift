@@ -18,6 +18,9 @@ class ItemListData: ObservableObject {
     var query: String? {
         didSet {
             page = 1
+            stopFetching = false
+            error = nil
+            items.removeAll()
         }
     }
     
@@ -47,6 +50,12 @@ class ItemListData: ObservableObject {
         }
     }
     
+    @Published var error: ItemQuery.QueryError? {
+        didSet {
+            self.didChange.send(self)
+        }
+    }
+    
     func getItems() {
         guard !stopFetching else { return }
         let currentPage = page
@@ -60,13 +69,18 @@ class ItemListData: ObservableObject {
                 } else {
                     self.items.append(contentsOf: items)
                 }
-                if items.isEmpty {
-                    print("Found nothing :/")
-                    self.stopFetching = true
-                }
                 self.page = currentPage + 1
-            default:
-                self.items = []
+            case .failure(let error):
+                switch error {
+                case .emptyList:
+                    if self.items.isEmpty {
+                        self.error = error
+                    } else {
+                        self.stopFetching = true
+                    }
+                default:
+                    self.error = error
+                }
             }
         }
     }

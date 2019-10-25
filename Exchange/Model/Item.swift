@@ -141,6 +141,17 @@ struct Item: Codable, Identifiable {
                               currentPrice: 0,
                               timestamp: "")
     }
+    
+    init(name: String, type: Int, priceDiff: Double, global: HistoricalPrice) {
+        self.name = name
+        self.type = type
+        self.priceDiff = priceDiff
+        self.global = global
+        let weekPrice = WeekPrice(data: [], change: 0)
+        sea = HistoricalPrice(week: weekPrice,
+                              currentPrice: 0,
+                              timestamp: "")
+    }
 }
 
 struct HistoricalPrice: Codable {
@@ -174,7 +185,7 @@ struct Price: Codable {
 
 extension Item {
     var hasWeekData: Bool {
-        global.week != nil
+        global.week != nil && !global.week!.data.isEmpty
     }
     
     var isNegative: Bool {
@@ -200,4 +211,8 @@ extension Item {
         global.currentPrice
     }
     
+    var weeklyPrices: [Price] {
+        guard let weekData = global.week else { return [] }
+        return weekData.data
+    }
 }

@@ -12,6 +12,19 @@ import Combine
 struct ItemQuery {
     enum QueryError: Error {
         case badURL
+        case other(Error)
+        case emptyList
+        
+        var localizedDescription: String {
+            switch self {
+            case .badURL:
+                return "Failed to generate proper URL."
+            case .other(let error):
+                return "\(error.localizedDescription)"
+            case .emptyList:
+                return "No items match your query."
+            }
+        }
     }
     
     func url(itemType: Int?, query: String?, page: Int) -> URL? {
@@ -37,7 +50,7 @@ struct ItemQuery {
     func getItems(itemType: Int?,
                   query: String?,
                   page: Int,
-                  completion: @escaping (Result<[Item], Error>) -> Void) -> AnyCancellable? {
+                  completion: @escaping (Result<[Item], QueryError>) -> Void) -> AnyCancellable? {
         guard let url = url(itemType: itemType,
                             query: query,
                             page: page) else {
@@ -56,10 +69,15 @@ struct ItemQuery {
                     break
                 case .failure(let error):
                     print(url)
-                    fatalError(error.localizedDescription)
+                    print(error)
+                    completion(.failure(QueryError.other(error)))
                 }
             }, receiveValue: { items in
-                completion(.success(items))
+                if items.isEmpty {
+                    completion(.failure(QueryError.emptyList))
+                } else {
+                    completion(.success(items))
+                }
             })
     }
 }

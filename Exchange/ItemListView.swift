@@ -27,11 +27,12 @@ struct ItemListView: View {
                     self.itemData.query = self.searchQuery
                     self.itemData.getItems()
                 }
+                .font(.headline)
             }
             
             Section {
                 ForEach(itemData.items) { item in
-                    ItemView(item: item)
+                    ItemView(model: ItemSelectable(item: item))
                     .onAppear(perform: {
                         if self.itemData.items.count >= 20 && item.id == self.itemData.items.last?.id {
                             // Make API call to next page
@@ -41,10 +42,17 @@ struct ItemListView: View {
                     })
                 }
             }
+            
+            Section {
+                if itemData.error != nil {
+                    Text(itemData.error!.localizedDescription)
+                        .foregroundColor(.secondary)
+                }
+            }
         }
         .navigationBarTitle(itemData.description)
         .onAppear(perform: {
-            if self.option != .search {
+            if self.option != .search && self.itemData.page <= 1 {
                 self.itemData.getItems()
             }
         })
@@ -55,7 +63,19 @@ struct ItemListView: View {
 }
 
 struct ItemListView_Previews: PreviewProvider {
+    
+    static var itemData: ItemListData = {
+        let data = ItemListData(query: "Shield")
+        
+        let weekPrice = WeekPrice(data: [], change: 5.6)
+        let historical = HistoricalPrice(week: weekPrice,
+                                         currentPrice: 125_750,
+                                         timestamp: "")
+        data.items = [Item(name: "Shield shard", type: 1, priceDiff: -3.8, global: historical)]
+        return data
+    }()
+    
     static var previews: some View {
-        ItemListView(option: .search, itemData: ItemListData(query: ""))
+        ItemListView(option: .search, itemData: itemData)
     }
 }

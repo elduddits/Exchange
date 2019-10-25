@@ -17,65 +17,60 @@ extension Int: ReferenceConvertible {
 }
 
 struct ItemView: View {
-    let item: Item
-    
-    static let currencyFormatter: NumberFormatter = {
-        let formatter = NumberFormatter()
-        formatter.maximumFractionDigits = 0
-        formatter.numberStyle = .currency
-        formatter.currencySymbol = ""
-        return formatter
-    }()
-    
+    @ObservedObject var model: ItemSelectable
+   
     var body: some View {
-        HStack {
-            VStack(alignment: .leading, spacing: 5) {
-                Text(item.name)
-                HStack {
-                    Text(item.itemType.description)
-                        .foregroundColor(.secondary)
-                    if item.isOnSnapPeriod {
-                        Text("Open bet")
-                            .padding(EdgeInsets(top: 1, leading: 4, bottom: 1, trailing: 4))
-                            .foregroundColor(.red)
-                            .background(Color.red
-                                .opacity(0.3)
-                            )
-                            .clipShape(Capsule())
-                    }
-                }
-                .font(.caption)
-                
-                HStack {
-                    if item.price != 0 {
-                        Text("\(item.price, formatter: Self.currencyFormatter)")
-                        Image(systemName: "z.circle")
-                    } else {
-                        Text("N/A")
-                    }
-                }
-                .font(.body)
-            }
-            
-            Spacer()
-            
+        VStack(alignment: .leading) {
             HStack {
-                if item.hasWeekData && item.change != 0 {
-                    Text("\(item.change, specifier: "%.2f")%")
-                    Image(systemName: item.isNegative ? "arrowtriangle.down.circle.fill" :  "arrowtriangle.up.circle.fill")
-                } else {
-                    Text("-")
-                        .foregroundColor(.gray)
+                VStack(alignment: .leading, spacing: 5) {
+                    Text(model.item.name)
+                    
+                    model.itemDetailsView
+                    
+                    model.priceView
                 }
+                
+                Spacer()
+                
+                model.priceChangeView
+                
             }
-            .font(.caption)
-            .foregroundColor(item.isNegative ? .red : .green)
+            .contentShape(Rectangle())
+            .onTapGesture {
+                self.model.isSelected.toggle()
+            }
+            
+            if model.showWeeklyGraph {
+                model.weeklyPriceView
+            }
         }
     }
 }
 
 struct ItemView_Previews: PreviewProvider {
+    static var item: Item = {
+        let prices: [Price] = [
+            Price(snap: false, price: 10000, timestamp: ""),
+            Price(snap: false, price: 12500, timestamp: ""),
+            Price(snap: false, price: 13000, timestamp: ""),
+            Price(snap: false, price: 9000, timestamp: ""),
+            Price(snap: false, price: 6000, timestamp: ""),
+            Price(snap: false, price: 3000, timestamp: ""),
+            Price(snap: false, price: 4444, timestamp: "")
+        ]
+        let weekPrice = WeekPrice(data: prices, change: 5.6)
+        let historical = HistoricalPrice(week: weekPrice,
+                                         currentPrice: 125_750,
+                                         timestamp: "")
+        return Item(name: "Shield shard", type: 1, priceDiff: -3.8, global: historical)
+    }()
+    
     static var previews: some View {
-        ItemView(item: Item())
+        Group {
+            ItemView(model: ItemSelectable(item: item))
+            
+            ItemView(model: ItemSelectable(item: item, isSelected: true))
+                
+        }
     }
 }
