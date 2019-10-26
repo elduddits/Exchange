@@ -27,7 +27,6 @@ struct ItemListView: View {
                     self.itemData.query = self.searchQuery
                     self.itemData.getItems()
                 }
-                .font(.headline)
             }
             
             Section {

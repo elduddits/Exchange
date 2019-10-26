@@ -75,7 +75,7 @@ struct MenuView: View {
     var body: some View {
         NavigationView {
             List {
-                Text("Use this app to search for items for Ragnarok Online Mobile: Eternal Guardians of Love. Currently, all prices are for Global server.")
+                Text("Use this app to search for items for Ragnarok Online Mobile. Currently, all prices are for Global server.")
                 .poweredByFooter(title: "ROM Exchange",
                                  url: URL(string: "https://www.romexchange.com"))
                 ForEach(Options.allCases, id: \.self) { option in
@@ -85,7 +85,7 @@ struct MenuView: View {
                 }
             }
             .listStyle(GroupedListStyle())
-            .navigationBarTitle("Exchange")
+            .navigationBarTitle("Exchange RO:M")
         }
     }
 }
