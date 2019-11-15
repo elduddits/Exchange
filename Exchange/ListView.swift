@@ -45,12 +45,14 @@ struct ListView: View {
                 ItemListView(option: .costume,
                              itemData: ItemListData(itemType: option))
             } else {
-                EmptyView()
-                .poweredByFooter(title: "ROM Exchange",
-                                 url: URL(string: "https://www.romexchange.com"))
-                List(subitems, id: \.rawValue) { subitem in
-                    NavigationLink(destination: ItemListView(option: self.option, itemData: ItemListData(itemType: subitem))) {
-                        Text(subitem.description)
+                List {
+                    EmptyView()
+                        .poweredByFooter(title: "ROM Exchange",
+                                         url: URL(string: "https://www.romexchange.com"))
+                    ForEach(subitems, id: \.rawValue) { subitem in
+                        NavigationLink(destination: ItemListView(option: self.option, itemData: ItemListData(itemType: subitem))) {
+                            Text(subitem.description)
+                        }
                     }
                 }
             }

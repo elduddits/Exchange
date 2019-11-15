@@ -44,7 +44,7 @@ struct BarGraphComponent: View {
     }
     
     var body: some View {
-        Rectangle()
+        RoundedRectangle(cornerSize: CGSize(width: 5, height: 2), style: .circular)
             .fill(data.isSelected ? Color.green : Color.blue)
             .frame(maxWidth: 20,
                    maxHeight: height * data.barHeight,

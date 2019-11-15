@@ -87,6 +87,7 @@ struct MenuView: View {
             .listStyle(GroupedListStyle())
             .navigationBarTitle("Exchange RO:M")
         }
+        .navigationViewStyle(StackNavigationViewStyle())
     }
 }
 
